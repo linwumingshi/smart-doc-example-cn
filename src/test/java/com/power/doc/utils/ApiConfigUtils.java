@@ -4,10 +4,12 @@ import com.google.gson.Gson;
 import com.ly.doc.model.ApiConfig;
 import com.ly.doc.model.ApiDataDictionary;
 import com.ly.doc.model.ApiErrorCodeDictionary;
+import com.ly.doc.model.SourceCodePath;
 import com.power.common.util.CollectionUtil;
 import lombok.experimental.UtilityClass;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -31,8 +33,7 @@ public class ApiConfigUtils {
      */
     public static ApiConfig getProjectApiConfig() throws IOException {
         // Read JSON from file
-        try (Reader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(ApiConfigUtils.class.getClassLoader().getResourceAsStream("smart-doc.json"))))) {
+        try (Reader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(ApiConfigUtils.class.getClassLoader().getResourceAsStream("smart-doc.json"))))) {
 
             // get gson
             Gson gson = new Gson();
@@ -46,6 +47,11 @@ public class ApiConfigUtils {
             // set baseDir and codePath
             apiConfig.setBaseDir(System.getProperty("user.dir"));
             apiConfig.setCodePath("src/main/java");
+
+            // set sourceCodePath
+            String path = apiConfig.getBaseDir() + File.separator + apiConfig.getCodePath();
+            SourceCodePath sourceCodePath = SourceCodePath.builder().setPath(path);
+            apiConfig.setSourceCodePaths(sourceCodePath);
 
             List<ApiErrorCodeDictionary> errorCodeDictionaries = apiConfig.getErrorCodeDictionaries();
             if (CollectionUtil.isNotEmpty(errorCodeDictionaries)) {
